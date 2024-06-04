@@ -1,0 +1,91 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            //File myObj = new File("advent/day9/day9Sample");
+            File myObj = new File("advent/day9/day9");
+            Scanner myReader = new Scanner(myObj);
+
+            List<List<Integer>> sequences = new ArrayList<List<Integer>>();
+
+            double totalVal = 0;
+
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                //System.out.println(data);
+                String[] split = data.split(" ");
+                List<Integer> row = new ArrayList<Integer>();
+                for (String s : split) {
+                    row.add(Integer.parseInt(s));
+                }
+                sequences.add(row);
+            }
+            myReader.close();
+
+            for (List<Integer> sequence : sequences) {
+                //System.out.println(sequence);
+                boolean finished = false;
+                List<List<Integer>> history = new ArrayList<List<Integer>>();
+                history.add(sequence);
+                List<Integer> differences = new ArrayList<Integer>();
+                List<Integer> curList = new ArrayList<Integer>(sequence);
+                while (!finished) {
+                    int lastDif = curList.get(curList.size() - 1) - curList.get(curList.size() - 2);
+                    int secondLastDif = curList.get(curList.size() - 2) - curList.get(curList.size() - 3);
+                    //differences.add(curList.get(curList.size() - 1) + lastDif + lastDif - secondLastDif);
+                    if (lastDif == 0) {
+                        finished = true;
+                    }
+                    else {
+
+                        List<Integer> newList = new ArrayList<Integer>();
+                        for (int i = 1; i < curList.size() - 2; i++) {
+                            //curList.set(i-1, sequence.get(i) - sequence.get(i - 1));
+                            newList.add(curList.get(i) - curList.get(i - 1));
+                        }
+                        newList.add(secondLastDif);
+                        newList.add(lastDif);
+                        curList = newList;
+                        history.add(newList);
+                        System.out.println(curList);
+                    }
+
+                }
+
+
+                for (int i = history.size() - 1; i > 0; i--) {
+                    List<Integer> prev = history.get(i);
+                    List<Integer> cur = history.get(i-1);
+                    List<Integer> replace = new ArrayList<Integer>();
+                    replace.add(cur.get(0) - prev.get(0));
+
+                    history.set(i - 1, replace);
+                    if (i == 1) {
+                        totalVal += replace.get(replace.size() - 1);
+                    }
+                }
+                for (List<Integer> row : history) {
+                    System.out.println(row);
+                }
+
+                System.out.println(differences);
+
+
+            }
+            System.out.println(totalVal);
+
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+
+    }
+
+}
