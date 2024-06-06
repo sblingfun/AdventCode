@@ -1,0 +1,217 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            //File myObj = new File("advent/day10/day10Sample");
+            //File myObj = new File("advent/day10/day10Sample2");
+            File myObj = new File("/advent/day10/day10");
+            Scanner myReader = new Scanner(myObj);
+
+            List<List<Character>> map = new ArrayList<List<Character>>();
+
+            int sRow = 0;
+            int sCol = -1;
+
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+
+                //System.out.println(data);
+                List<Character> row = new ArrayList<Character>();
+
+                for (int i = 0; i < data.length(); i++) {
+                    if (data.charAt(i) == 'S') {
+                        sCol = i;
+                    }
+                    row.add(data.charAt(i));
+                }
+                if (sCol == -1) {
+                    sRow++;
+                }
+
+                map.add(row);
+
+            }
+            myReader.close();
+
+            /*
+            for (List<Character> line : map) {
+                System.out.println(line);
+            }
+            System.out.println("");
+
+
+            //System.out.println(sRow + " , " + sCol);
+
+            List<Integer> test = new ArrayList<Integer>();
+            test.add(2);
+            test.add(1);
+            int testPrev = 1;//E
+            System.out.println(addLoop(map,test,Integer.valueOf(testPrev)));
+            //System.out.println(checkNext(map, test, Integer.valueOf(testPrev)));
+             */
+            int answer = 0;
+            List<Integer> input = new ArrayList<Integer>(Arrays.asList(sRow,sCol));
+            if (sRow - 1 >= 0) {
+                input.set(0,sRow - 1);
+                answer = Math.max(answer, addLoop(map,input,Integer.valueOf(0))); //check N
+            }
+            if (sRow + 1 < map.get(0).size()) {
+                input.set(0, sRow + 1);
+                answer = Math.max(answer, addLoop(map,input,Integer.valueOf(2))); //check S
+            }
+            if (sCol - 1 >= 0) {
+                input.set(0, sRow);
+                input.set(1, sCol - 1);
+                answer = Math.max(answer, addLoop(map,input,Integer.valueOf(3))); //check W
+            }
+            if (sCol + 1 < map.size()) {
+                input.set(0, sRow);
+                input.set(1, sCol + 1);
+                answer = Math.max(answer, addLoop(map,input,Integer.valueOf(1))); //check E
+            }
+            if (answer != 0) {
+                if (answer % 2 == 1) {
+                    answer = answer / 2 + 1;
+                }
+                else {
+                    answer /= 2;
+                }
+
+            }
+            System.out.println(answer);
+
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public static int addLoop(List<List<Character>> map, List<Integer> sCord, Integer prevDir) {
+
+        //List<List<Integer>> retList = new ArrayList<List<Integer>>();
+        int retVal = 0;
+        List<Integer> target = new ArrayList<Integer>(Arrays.asList(-2,-2,-2));
+        List<Integer> invalid = new ArrayList<Integer>(Arrays.asList(-1,-1,-1));
+        List<Integer> response = new ArrayList<Integer>();
+        while (!target.equals(response)) {
+            response = checkNext(map, sCord, prevDir);
+            if (invalid.equals(response)) {
+                return 0;
+            }
+            prevDir = response.get(2);
+            sCord = response.subList(0,2);
+            retVal++;
+        }
+
+        return retVal;
+    }
+    public static List<Integer> checkNext(List<List<Character>> map, List<Integer> sCord, Integer prevDir) {
+        List<Integer> newCord = new ArrayList<Integer>();
+        newCord.addFirst(-1);
+        newCord.add(-1);
+        newCord.add(prevDir);
+        Integer direction = Integer.valueOf(-1);
+        switch (map.get(sCord.get(0)).get(sCord.get(1))) {
+            case '.' :
+                break;
+            case '|' :
+                if (prevDir == 0) { //N
+                    newCord.set(0, sCord.get(0) - 1);
+                    newCord.set(1, sCord.get(1));
+                    direction = Integer.valueOf(0);//N
+                }
+                else if (prevDir == 2) { //S
+                    newCord.set(0, sCord.get(0) + 1);
+                    newCord.set(1, sCord.get(1));
+                    direction = Integer.valueOf(2);//S
+                }
+                break;
+            case '-' :
+                if (prevDir == 1) { //E
+                    newCord.set(0, sCord.get(0));
+                    newCord.set(1, sCord.get(1) + 1);
+                    direction = Integer.valueOf(1);//E
+                }
+                else if (prevDir == 3) { //W
+                    newCord.set(0, sCord.get(0));
+                    newCord.set(1, sCord.get(1) - 1);
+                    direction = Integer.valueOf(3);//W
+                }
+                break;
+            case 'L' :
+                if (prevDir == 2) { //S
+                    newCord.set(0, sCord.get(0));
+                    newCord.set(1, sCord.get(1) + 1);
+                    direction = Integer.valueOf(1);//E
+                }
+                else if (prevDir == 3) { //W
+                    newCord.set(0, sCord.get(0) - 1);
+                    newCord.set(1, sCord.get(1));
+                    direction = Integer.valueOf(0);//N
+                }
+                break;
+            case 'J' :
+                if (prevDir == 2) { //S
+                    newCord.set(0, sCord.get(0));
+                    newCord.set(1, sCord.get(1) - 1);
+                    direction = Integer.valueOf(3);//W
+                }
+                else if (prevDir == 1) { //E
+                    newCord.set(0, sCord.get(0) - 1);
+                    newCord.set(1, sCord.get(1));
+                    direction = Integer.valueOf(0);//N
+                }
+                break;
+            case '7' :
+                if (prevDir == 0) { //N
+                    newCord.set(0, sCord.get(0));
+                    newCord.set(1, sCord.get(1) - 1);
+                    direction = Integer.valueOf(3);//W
+                }
+                else if (prevDir == 1) { //E
+                    newCord.set(0, sCord.get(0) + 1);
+                    newCord.set(1, sCord.get(1));
+                    direction = Integer.valueOf(2);//S
+                }
+                break;
+            case 'F' :
+                if (prevDir == 0) { //N
+                    newCord.set(0, sCord.get(0));
+                    newCord.set(1, sCord.get(1) + 1);
+                    direction = Integer.valueOf(1);//E
+                }
+                else if (prevDir == 3) { //W
+                    newCord.set(0, sCord.get(0) + 1);
+                    newCord.set(1, sCord.get(1));
+                    direction = Integer.valueOf(2);//S
+                }
+                break;
+            case 'S' :
+                newCord.set(0,-2);
+                newCord.set(1,-2);
+                direction = Integer.valueOf(-2);
+                break;
+        }
+        if (newCord.get(0) >= map.size() || newCord.get(1) >= map.get(0).size() ) {
+            newCord.set(0,-1);
+            newCord.set(1,-1);
+        }
+        newCord.set(2,direction);
+        System.out.println(newCord);
+        return newCord;
+    }
+
+    /*
+    Directions
+    N = 0
+    E = 1
+    S = 2
+    W = 3
+    */
+
+}
