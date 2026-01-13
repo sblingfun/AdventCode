@@ -79,13 +79,21 @@ public class Day3Part2 {
                 maxValue = line.charAt(maxIdx + 1) - '0';
                 maxIdx = maxIdx + 1;
                 for (int i = maxIdx; i < line.length(); i++) {
-                    if (line.charAt(i) - '0' > maxValue && line.length() - i < 12) {
-                        maxValue = line.charAt(i);
-                        foundVals = 1;
+                    System.out.println("Max val: " + maxValue);
+                    if (line.charAt(i) - '0' > maxValue) {
+                        maxValue = line.charAt(i) - '0';
+                        if (i + 12 <= line.length()) {
+                            foundVals = 1;
+                        }
+                        else {
+                            foundVals = line.length() - i;
+                        }
                         while (maxDigits.size() > foundVals) {
                             maxDigits.poll();
                         }
                     }
+                    //
+                    if (line.charAt(i) == )
                     if (maxDigits.size() >= 12) {
                         if ( maxDigits.peek().get(0) < line.charAt(i) - '0') {
                             maxDigits.poll();
